@@ -1,7 +1,7 @@
 const categoryModel = require('../models/categoryModel');
 const slugify = require('slugify')
 const asyncHandler = require('express-async-handler');
-
+const ApiError = require('../utils/apiError');
 
 const addCategory = asyncHandler(async (req, res, next) => {
     const { name, image } = req.body;
@@ -39,10 +39,8 @@ const getCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await categoryModel.findById(id);
     if (!category) {
-        return res.status(404).send({
-            message: 'Category not found',
-            data: null
-        });
+        next(new ApiError(`Category not found with id ${id}`, 404));
+        return;
     }
     res.status(200).send({
         message: 'Category retrieved successfully',
@@ -58,10 +56,8 @@ const updateCategory = asyncHandler(async (req, res, next) => {
     const { name } = req.body;
     const category = await categoryModel.findById(id);
     if (!category) {
-        return res.status(404).send({
-            message: 'Category not found',
-            data: null
-        });
+        next(new ApiError(`Category not found `, 404));
+        return;
     }
 
     category.name = name;
@@ -81,10 +77,9 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await categoryModel.findById(id);
     if (!category) {
-        return res.status(404).send({
-            message: 'Category not found',
-            data: null
-        });
+
+        next(new ApiError(`Category not found with id ${id}`, 404));
+        return;
     }
     await category.deleteOne();
     res.status(204).send({
