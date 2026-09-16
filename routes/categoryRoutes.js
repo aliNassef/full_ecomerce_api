@@ -1,16 +1,15 @@
 const express = require('express');
 const categoryController = require('../controllers/categoryController');
 const router = express.Router();
-
-
+const categoryValidator = require('../utils/validators/categoryValidator');
 router.route('/')
-    .post(categoryController.addCategory)
+    .post(categoryValidator.addCategoryValidator, categoryController.addCategory)
     .get(categoryController.getCategories);
 
 router.route('/:id')
-    .get(categoryController.getCategory)
-    .patch(categoryController.updateCategory)
-    .delete(categoryController.deleteCategory);
+    .get(categoryValidator.getCategoryByIdValidator, categoryController.getCategory)
+    .patch(categoryValidator.updateCategoryValidator, categoryController.updateCategory)
+    .delete(categoryValidator.deleteCategoryValidator, categoryController.deleteCategory);
 
 
 
