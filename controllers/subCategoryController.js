@@ -69,7 +69,7 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     subCategory.name = name;
     subCategory.category = category;
     subCategory.slug = slugify(name, { lower: true });
-    await subCategory.save();
+    await subCategory.updateOne();
     res.status(200).send({
         message: 'Sub category updated successfully',
         data: {
