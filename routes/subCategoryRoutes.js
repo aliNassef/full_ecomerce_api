@@ -1,14 +1,15 @@
 const express = require('express');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 const subCategoryController = require('../controllers/subCategoryController');
 
 const subCategoryValidator = require('../utils/validators/subCategoryValidator');
 
+
 router.route('/')
-    .get(subCategoryController.getSubCategories)
-    .post(subCategoryValidator.addSubCategoryValidator, subCategoryController.addNewSubCategory);
+    .get(subCategoryController.createfilteredObject, subCategoryController.getSubCategories)
+    .post(subCategoryController.setCategoryId, subCategoryValidator.addSubCategoryValidator, subCategoryController.addNewSubCategory);
 
 router.route('/:id')
     .get(subCategoryValidator.getSubCategoryyByIdValidator, subCategoryController.getSubCategory)

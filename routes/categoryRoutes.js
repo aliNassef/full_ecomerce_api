@@ -5,6 +5,11 @@ const router = express.Router();
 
 const categoryValidator = require('../utils/validators/categoryValidator');
 
+const subCategoryRouter = require('./subCategoryRoutes');
+
+router.use('/:categoryId/subCategory', subCategoryRouter);
+
+
 router.route('/')
     .post(categoryValidator.addCategoryValidator, categoryController.addCategory)
     .get(categoryController.getCategories);

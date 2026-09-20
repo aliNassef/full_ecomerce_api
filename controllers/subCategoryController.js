@@ -5,6 +5,12 @@ const ApiError = require("../utils/apiError");
 
 const SubCategoryModel = require('../models/subCategoryModel');
 
+const setCategoryId = (req, res, next) => {
+    if (!req.body.category) req.body.category = req.params.categoryId;
+    next();
+}
+
+// if category not in body but that in params.
 const addNewSubCategory = asyncHandler(
     async (req, res, next) => {
         const { name, category } = req.body;
@@ -25,12 +31,19 @@ const addNewSubCategory = asyncHandler(
     }
 );
 
+const createfilteredObject = (req, res, next) => {
+    let filteredObject = {};
+    if (req.params.categoryId) filteredObject = { category: req.params.categoryId };
+
+    req.filteredObject = filteredObject;
+    next();
+};
+
 const getSubCategories = asyncHandler(async (req, res, next) => {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
     const skip = (page - 1) * limit;
-
-    const subCategories = await SubCategoryModel.find().skip(skip).limit(limit);
+    const subCategories = await SubCategoryModel.find(req.filteredObject).skip(skip).limit(limit);
 
     res.status(200).send({
         message: 'Sub categories retrieved successfully',
@@ -99,4 +112,6 @@ module.exports = {
     getSubCategory,
     updateSubCategory,
     deleteSubCategory,
+    setCategoryId,
+    createfilteredObject
 };
