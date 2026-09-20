@@ -5,11 +5,16 @@ const ApiError = require("../utils/apiError");
 
 const SubCategoryModel = require('../models/subCategoryModel');
 
+// @desc Middleware to attach categoryId from params to request body when missing
+// @middleware
 const setCategoryId = (req, res, next) => {
     if (!req.body.category) req.body.category = req.params.categoryId;
     next();
 }
 
+// @desc Add a new subcategory
+// @route POST /categories/:categoryId/subcategories
+// @access Public
 // if category not in body but that in params.
 const addNewSubCategory = asyncHandler(
     async (req, res, next) => {
@@ -31,6 +36,8 @@ const addNewSubCategory = asyncHandler(
     }
 );
 
+// @desc Middleware to filter subcategories by category id when present in params
+// @middleware
 const createfilteredObject = (req, res, next) => {
     let filteredObject = {};
     if (req.params.categoryId) filteredObject = { category: req.params.categoryId };
@@ -39,6 +46,9 @@ const createfilteredObject = (req, res, next) => {
     next();
 };
 
+// @desc Get all subcategories for a category
+// @route GET /categories/:categoryId/subcategories
+// @access Public
 const getSubCategories = asyncHandler(async (req, res, next) => {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
@@ -53,7 +63,9 @@ const getSubCategories = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+// @desc Get a single subcategory by id
+// @route GET /categories/:categoryId/subcategories/:id
+// @access Public
 const getSubCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const subCategory = await SubCategoryModel.findById(id);
@@ -69,7 +81,9 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+// @desc Update a subcategory
+// @route PATCH /categories/:categoryId/subcategories/:id
+// @access Public
 const updateSubCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -91,7 +105,9 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+// @desc Delete a subcategory
+// @route DELETE /categories/:categoryId/subcategories/:id
+// @access Public
 const deleteSubCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const subCategory = await SubCategoryModel.findById(id);

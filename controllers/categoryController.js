@@ -6,6 +6,9 @@ const CategoryModel = require('../models/categoryModel');
 
 const ApiError = require('../utils/apiError');
 
+// @desc Add a new category
+// @route POST /categories
+// @access Public
 const addCategory = asyncHandler(async (req, res, next) => {
     const { name, image } = req.body;
     const slugifiedName = slugify(name, { lower: true });
@@ -23,6 +26,9 @@ const addCategory = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc Get all categories
+// @route GET /categories
+// @access Public
 const getCategories = asyncHandler(async (req, res, next) => {
     const page = req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 10;
@@ -37,7 +43,9 @@ const getCategories = asyncHandler(async (req, res, next) => {
     },);
 });
 
-
+// @desc Get a single category by id
+// @route GET /categories/:id
+// @access Public
 const getCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await CategoryModel.findById(id);
@@ -53,7 +61,9 @@ const getCategory = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+// @desc Update a category
+// @route PATCH /categories/:id
+// @access Public
 const updateCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -74,8 +84,9 @@ const updateCategory = asyncHandler(async (req, res, next) => {
     });
 });
 
-
-
+// @desc Delete a category
+// @route DELETE /categories/:id
+// @access Public
 const deleteCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await CategoryModel.findById(id);

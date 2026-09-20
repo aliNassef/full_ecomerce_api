@@ -20,6 +20,9 @@ const getBrands = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc Get a single brand by id
+// @route GET /brands/:id
+// @access Public
 const getBrand = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const brand = await BrandModel.findById(id);
@@ -34,6 +37,9 @@ const getBrand = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc Update a brand
+// @route PATCH /brands/:id
+// @access Public
 const updateBrand = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -50,7 +56,9 @@ const updateBrand = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+// @desc Delete a brand
+// @route DELETE /brands/:id
+// @access Public
 const deleteBrand = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const brand = await BrandModel.findById(id);
@@ -63,6 +71,9 @@ const deleteBrand = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc Create a new brand
+// @route POST /brands
+// @access Public
 const addNewBrand = asyncHandler(
     async (req, res, next) => {
         const { name } = req.body;
