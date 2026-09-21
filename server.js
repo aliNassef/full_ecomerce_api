@@ -31,7 +31,6 @@ app.use('/api/V1/subCategory', subCategoryRoutes);
 app.use('/api/V1/brands', brandRoutes);
 app.use('/api/V1/products', productRoutes);
 app.all('/{*splat}', (req, res, next) => {
-
     next(new ApiError(`Not Found ${req.originalUrl}`, 404));
 });
 
@@ -48,6 +47,3 @@ process.on('unhandledRejection', (err) => {
         process.exit(1);
     });
 });
-
-
-

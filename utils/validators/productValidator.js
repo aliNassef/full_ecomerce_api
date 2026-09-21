@@ -1,5 +1,7 @@
 const { check } = require('express-validator');
 const validatorMiddleware = require('../../middlewares/valdatorMiddleware');
+const CategoryModel = require('../../models/categoryModel');
+const SubCategoryModel = require('../../models/subCategoryModel');
 
 const productValidator = {
     addNewProductValidator: [
@@ -21,8 +23,16 @@ const productValidator = {
             .notEmpty()
             .withMessage('Category is required')
             .isMongoId()
-            .withMessage('Invalid category id'),
+            .withMessage('Invalid category id')
+            .custom(async (categoryId) => {
+                const category = await CategoryModel.findById(categoryId);
 
+                if (!category) {
+                    throw new Error('Category does not exist');
+                }
+
+                return true;
+            }),
         check('stock')
             .notEmpty()
             .withMessage('Stock is required')
@@ -41,8 +51,28 @@ const productValidator = {
         check('subcategory')
             .optional()
             .isArray()
-            .withMessage('Subcategory must be an array'),
+            .withMessage('Subcategory must be an array')
+            .custom(async (value) => {
+                const subCategories = await SubCategoryModel.find({ _id: { $exists: true, $in: value } });
+                if (value.length < 1 || subCategories.length !== value.length) {
+                    throw new Error('Subcategory does not exist');
+                }
+                return true;
+            })
+            .custom(async (value, { req }) => {
+                const subCategories = await SubCategoryModel.find({
+                    _id: { $in: value },
+                    category: req.body.category,
+                });
 
+                if (subCategories.length !== value.length) {
+                    throw new Error(
+                        'One or more subcategories do not exist or do not belong to this category'
+                    );
+                }
+
+                return true;
+            }),
         check('colors')
             .optional()
             .isArray()
