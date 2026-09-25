@@ -6,8 +6,11 @@ require('dotenv').config({ path: 'config.env' });
 const databaseConfig = require('./config/database');
 
 const categoryRoutes = require('./routes/categoryRoutes');
+const qs = require('qs');
 
 const app = express();
+
+app.set('query parser', (str) => qs.parse(str));
 const ApiError = require('./utils/apiError');
 const globalErrorHandling = require('./middlewares/errMiddleware');
 
