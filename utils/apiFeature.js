@@ -60,15 +60,20 @@ class ApiFeature {
         return this;
     }
 
-    search() {
+    search(searchKeys = ['title', 'description']) {
         if (this.queryString.keyword) {
-            const query = {};
-            query.$or = [
-                { title: { $regex: this.queryString.keyword, $options: 'i' } },
-                { description: { $regex: this.queryString.keyword, $options: 'i' } },
-            ];
+            const query = {
+                $or: searchKeys.map((key) => ({
+                    [key]: {
+                        $regex: this.queryString.keyword,
+                        $options: 'i',
+                    },
+                })),
+            };
+
             this.mongooseQuery = this.mongooseQuery.find(query);
         }
+
         return this;
     }
 

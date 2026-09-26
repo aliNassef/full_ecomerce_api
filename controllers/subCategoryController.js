@@ -5,6 +5,8 @@ const ApiError = require("../utils/apiError");
 
 const SubCategoryModel = require('../models/subCategoryModel');
 
+const ApiFeature = require('../utils/apiFeature');
+
 // @desc Middleware to attach categoryId from params to request body when missing
 // @middleware
 const setCategoryId = (req, res, next) => {
@@ -50,13 +52,21 @@ const createfilteredObject = (req, res, next) => {
 // @route GET /categories/:categoryId/subcategories
 // @access Public
 const getSubCategories = asyncHandler(async (req, res, next) => {
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
-    const skip = (page - 1) * limit;
-    const subCategories = await SubCategoryModel.find(req.filteredObject).skip(skip).limit(limit);
+    const documentCount = await SubCategoryModel.countDocuments();
+    const apiFeature = new ApiFeature(SubCategoryModel.find(), req.query)
+        .filter()
+        .search()
+        .sort()
+        .limitFields()
+        .paginate(documentCount);
+
+    const { paginationResult, mongooseQuery } = apiFeature;
+    const subCategories = await mongooseQuery;
 
     res.status(200).send({
         message: 'Sub categories retrieved successfully',
+        paginationResult,
+        length: subCategories.length,
         data: {
             subCategories
         }

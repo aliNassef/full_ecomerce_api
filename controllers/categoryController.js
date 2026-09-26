@@ -6,6 +6,8 @@ const CategoryModel = require('../models/categoryModel');
 
 const ApiError = require('../utils/apiError');
 
+const ApiFeature = require('../utils/apiFeature');
+
 // @desc Add a new category
 // @route POST /categories
 // @access Public
@@ -30,13 +32,21 @@ const addCategory = asyncHandler(async (req, res, next) => {
 // @route GET /categories
 // @access Public
 const getCategories = asyncHandler(async (req, res, next) => {
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
-    const skip = (page - 1) * limit;
-    const categories = await CategoryModel.find().skip(skip).limit(limit);
-    console.log(categories);
+    const documentCount = await CategoryModel.countDocuments();
+    const apiFeature = new ApiFeature(CategoryModel.find(), req.query)
+        .filter()
+        .search(['name'])
+        .sort()
+        .limitFields()
+        .paginate(documentCount);
+
+
+    const { paginationResult, mongooseQuery } = apiFeature;
+    const categories = await mongooseQuery;
     res.status(200).send({
         message: 'Categories retrieved successfully',
+        paginationResult,
+        length: categories.length,
         data: {
             categories
         }
