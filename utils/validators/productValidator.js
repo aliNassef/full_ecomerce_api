@@ -1,4 +1,5 @@
 const { check } = require('express-validator');
+const slugify = require('slugify');
 const validatorMiddleware = require('../../middlewares/valdatorMiddleware');
 const CategoryModel = require('../../models/categoryModel');
 const SubCategoryModel = require('../../models/subCategoryModel');
@@ -89,7 +90,11 @@ const productValidator = {
         check('title')
             .optional()
             .notEmpty()
-            .withMessage('Title cannot be empty'),
+            .withMessage('Title cannot be empty')
+            .custom((val, { req }) => {
+                req.body.slug = slugify(val, { lower: true });
+                return true;
+            }),
 
         check('description')
             .optional()

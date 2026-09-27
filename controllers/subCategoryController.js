@@ -7,6 +7,8 @@ const SubCategoryModel = require('../models/subCategoryModel');
 
 const ApiFeature = require('../utils/apiFeature');
 
+const handlerFactory = require('./handlerFactory');
+
 // @desc Middleware to attach categoryId from params to request body when missing
 // @middleware
 const setCategoryId = (req, res, next) => {
@@ -94,41 +96,12 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 // @desc Update a subcategory
 // @route PATCH /categories/:categoryId/subcategories/:id
 // @access Public
-const updateSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
-    const { category } = req.body;
-    const subCategory = await SubCategoryModel.findById(id);
-    if (!subCategory) {
-        return next(new ApiError(`Sub category not found with id ${id}`, 404));
-    }
-
-    subCategory.name = name;
-    subCategory.category = category;
-    subCategory.slug = slugify(name, { lower: true });
-    await subCategory.updateOne();
-    res.status(200).send({
-        message: 'Sub category updated successfully',
-        data: {
-            subCategory
-        }
-    });
-});
+const updateSubCategory = handlerFactory.updateOne(SubCategoryModel);
 
 // @desc Delete a subcategory
 // @route DELETE /categories/:categoryId/subcategories/:id
 // @access Public
-const deleteSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const subCategory = await SubCategoryModel.findById(id);
-    if (!subCategory) {
-        return next(new ApiError(`Sub category not found with id ${id}`, 404));
-    }
-    await subCategory.deleteOne();
-    res.status(204).send({
-        message: 'Sub category deleted successfully',
-    });
-});
+const deleteSubCategory = handlerFactory.deleteOne(SubCategoryModel);
 
 
 

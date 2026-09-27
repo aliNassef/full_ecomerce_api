@@ -8,6 +8,9 @@ const ApiError = require('../utils/apiError');
 
 const ApiFeature = require('../utils/apiFeature');
 
+const handlerFactory = require('./handlerFactory');
+
+
 // @desc Add a new category
 // @route POST /categories
 // @access Public
@@ -74,42 +77,12 @@ const getCategory = asyncHandler(async (req, res, next) => {
 // @desc Update a category
 // @route PATCH /categories/:id
 // @access Public
-const updateCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
-    const category = await CategoryModel.findById(id);
-    if (!category) {
-        next(new ApiError(`Category not found `, 404));
-        return;
-    }
-
-    category.name = name;
-    category.slug = slugify(name, { lower: true });
-    await category.save();
-    res.status(200).send({
-        message: 'Category updated successfully',
-        data: {
-            category
-        }
-    });
-});
+const updateCategory = handlerFactory.updateOne(CategoryModel);
 
 // @desc Delete a category
 // @route DELETE /categories/:id
 // @access Public
-const deleteCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const category = await CategoryModel.findById(id);
-    if (!category) {
-
-        next(new ApiError(`Category not found with id ${id}`, 404));
-        return;
-    }
-    await category.deleteOne();
-    res.status(204).send({
-        message: 'Category deleted successfully',
-    });
-});
+const deleteCategory = handlerFactory.deleteOne(CategoryModel);
 
 
 

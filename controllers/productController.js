@@ -2,6 +2,9 @@ const slugify = require('slugify');
 const asyncHandler = require('express-async-handler');
 const ProductModel = require('../models/productModel');
 const ApiFeature = require('../utils/apiFeature');
+
+const handlerFactory = require('./handlerFactory');
+
 // @desc Get all products
 // @route GET /api/V1/products
 // @access Public
@@ -85,63 +88,11 @@ const addProduct = asyncHandler(async (req, res) => {
 // @desc Update product
 // @route PATCH /api/V1/products/:id
 // @access Private
-const updateProduct = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const { title, description, price, category, stock, thumbnail, priceAfterDiscount, brand, subcategory, image, sold, rating, ratingCount, colors } = req.body;
-
-    let slug;
-    if (title) {
-        slug = slugify(title, { lower: true });
-    };
-
-    const product = await ProductModel.findByIdAndUpdate(id, {
-        title,
-        slug,
-        description,
-        price,
-        category,
-        stock,
-        thumbnail,
-        priceAfterDiscount,
-        brand,
-        subcategory,
-        image,
-        sold,
-        rating,
-        ratingCount,
-        colors,
-    }, { new: true });
-    if (!product) {
-        return res.status(404).json({
-            message: 'Product not found',
-        });
-    }
-
-
-    res.status(200).json({
-        message: 'Product updated successfully',
-        data: product,
-    },
-    );
-});
-
+const updateProduct = handlerFactory.updateOne(ProductModel);
 // @desc Delete product
 // @route DELETE /api/V1/products/:id
 // @access Private
-const deleteProduct = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const product = await ProductModel.findByIdAndDelete(id);
-    if (!product) {
-        return res.status(404).json({
-            message: 'Product not found',
-        });
-    }
-    res.status(204).json({
-        message: 'Product deleted successfully',
-        data: product,
-    },
-    );
-});
+const deleteProduct = handlerFactory.deleteOne(ProductModel);
 
 module.exports = {
     getAllProducts,

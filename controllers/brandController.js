@@ -4,6 +4,8 @@ const ApiError = require("../utils/apiError");
 const BrandModel = require('../models/brandModel');
 const ApiFeature = require('../utils/apiFeature');
 
+const handlerFactory = require('./handlerFactory');
+
 // @desc Get all brands
 // @route GET /brands
 // @access Public
@@ -49,36 +51,11 @@ const getBrand = asyncHandler(async (req, res, next) => {
 // @desc Update a brand
 // @route PATCH /brands/:id
 // @access Public
-const updateBrand = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
-    const brand = await BrandModel.findByIdAndUpdate(id, { name, slug: slugify(name, { lower: true }) }, { new: true });
-    if (!brand) {
-        return next(new ApiError(`Brand not found with id ${id}`, 404));
-    }
-
-    res.status(200).send({
-        message: 'Brand updated successfully',
-        data: {
-            brand
-        }
-    });
-});
-
+const updateBrand = handlerFactory.updateOne(BrandModel);
 // @desc Delete a brand
 // @route DELETE /brands/:id
 // @access Public
-const deleteBrand = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const brand = await BrandModel.findById(id);
-    if (!brand) {
-        return next(new ApiError(`Brand not found with id ${id}`, 404));
-    }
-    await brand.deleteOne();
-    res.status(204).send({
-        message: 'Brand deleted successfully',
-    });
-});
+const deleteBrand = handlerFactory.deleteOne(BrandModel);
 
 // @desc Create a new brand
 // @route POST /brands
