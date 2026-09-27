@@ -1,12 +1,4 @@
-const asyncHandler = require("express-async-handler");
-
-const slugify = require('slugify');
-const ApiError = require("../utils/apiError");
-
 const SubCategoryModel = require('../models/subCategoryModel');
-
-const ApiFeature = require('../utils/apiFeature');
-
 const handlerFactory = require('./handlerFactory');
 
 // @desc Middleware to attach categoryId from params to request body when missing
@@ -20,25 +12,7 @@ const setCategoryId = (req, res, next) => {
 // @route POST /categories/:categoryId/subcategories
 // @access Public
 // if category not in body but that in params.
-const addNewSubCategory = asyncHandler(
-    async (req, res, next) => {
-        const { name, category } = req.body;
-        const slug = slugify(name, { lower: true });
-        const subCategory = new SubCategoryModel({
-            name,
-            slug,
-            category,
-        });
-
-        await subCategory.save();
-        res.status(201).send({
-            message: 'Sub category added successfully',
-            data: {
-                subCategory
-            }
-        },);
-    }
-);
+const addNewSubCategory = handlerFactory.createOne(SubCategoryModel);
 
 // @desc Middleware to filter subcategories by category id when present in params
 // @middleware
@@ -53,45 +27,12 @@ const createfilteredObject = (req, res, next) => {
 // @desc Get all subcategories for a category
 // @route GET /categories/:categoryId/subcategories
 // @access Public
-const getSubCategories = asyncHandler(async (req, res, next) => {
-    const documentCount = await SubCategoryModel.countDocuments();
-    const apiFeature = new ApiFeature(SubCategoryModel.find(), req.query)
-        .filter()
-        .search()
-        .sort()
-        .limitFields()
-        .paginate(documentCount);
-
-    const { paginationResult, mongooseQuery } = apiFeature;
-    const subCategories = await mongooseQuery;
-
-    res.status(200).send({
-        message: 'Sub categories retrieved successfully',
-        paginationResult,
-        length: subCategories.length,
-        data: {
-            subCategories
-        }
-    });
-});
+const getSubCategories = handlerFactory.getAll(SubCategoryModel);
 
 // @desc Get a single subcategory by id
 // @route GET /categories/:categoryId/subcategories/:id
 // @access Public
-const getSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const subCategory = await SubCategoryModel.findById(id);
-    if (!subCategory) {
-        return next(new ApiError(`Sub category not found with id ${id}`, 404));
-
-    }
-    res.status(200).send({
-        message: 'Sub category retrieved successfully',
-        data: {
-            subCategory
-        }
-    });
-});
+const getSubCategory = handlerFactory.getOne(SubCategoryModel);
 
 // @desc Update a subcategory
 // @route PATCH /categories/:categoryId/subcategories/:id

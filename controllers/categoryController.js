@@ -1,10 +1,7 @@
 const asyncHandler = require('express-async-handler');
 
-const slugify = require('slugify')
 
 const CategoryModel = require('../models/categoryModel');
-
-const ApiError = require('../utils/apiError');
 
 const ApiFeature = require('../utils/apiFeature');
 
@@ -14,66 +11,17 @@ const handlerFactory = require('./handlerFactory');
 // @desc Add a new category
 // @route POST /categories
 // @access Public
-const addCategory = asyncHandler(async (req, res, next) => {
-    const { name, image } = req.body;
-    const slugifiedName = slugify(name, { lower: true });
-    const category = new CategoryModel({
-        name,
-        slug: slugifiedName,
-    });
-
-    await category.save();
-    res.status(201).send({
-        message: 'Category added successfully',
-        data: {
-            category
-        }
-    });
-});
+const addCategory = handlerFactory.createOne(CategoryModel);
 
 // @desc Get all categories
 // @route GET /categories
 // @access Public
-const getCategories = asyncHandler(async (req, res, next) => {
-    const documentCount = await CategoryModel.countDocuments();
-    const apiFeature = new ApiFeature(CategoryModel.find(), req.query)
-        .filter()
-        .search(['name'])
-        .sort()
-        .limitFields()
-        .paginate(documentCount);
-
-
-    const { paginationResult, mongooseQuery } = apiFeature;
-    const categories = await mongooseQuery;
-    res.status(200).send({
-        message: 'Categories retrieved successfully',
-        paginationResult,
-        length: categories.length,
-        data: {
-            categories
-        }
-    },);
-});
+const getCategories = handlerFactory.getAll(CategoryModel, ['name']);
 
 // @desc Get a single category by id
 // @route GET /categories/:id
 // @access Public
-const getCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const category = await CategoryModel.findById(id);
-    if (!category) {
-        next(new ApiError(`Category not found with id ${id}`, 404));
-        return;
-    }
-    res.status(200).send({
-        message: 'Category retrieved successfully',
-        data: {
-            category
-        }
-    });
-});
-
+const getCategory = handlerFactory.getOne(CategoryModel);
 // @desc Update a category
 // @route PATCH /categories/:id
 // @access Public

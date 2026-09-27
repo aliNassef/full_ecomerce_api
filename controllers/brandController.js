@@ -1,52 +1,15 @@
-const slugify = require('slugify');
-const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/apiError");
 const BrandModel = require('../models/brandModel');
-const ApiFeature = require('../utils/apiFeature');
-
 const handlerFactory = require('./handlerFactory');
 
 // @desc Get all brands
 // @route GET /brands
 // @access Public
-const getBrands = asyncHandler(async (req, res, next) => {
-    const documentCount = await BrandModel.countDocuments();
-    const apiFeature = new ApiFeature(BrandModel.find(), req.query)
-        .filter()
-        .search(['name'])
-        .sort()
-        .limitFields()
-        .paginate(documentCount)
-
-    const { paginationResult, mongooseQuery } = apiFeature;
-    const brands = await mongooseQuery;
-
-    res.status(200).send({
-        message: 'Brands retrieved successfully',
-        paginationResult,
-        length: brands.length,
-        data: {
-            brands
-        }
-    });
-});
+const getBrands = handlerFactory.getAll(BrandModel, ['name']);
 
 // @desc Get a single brand by id
 // @route GET /brands/:id
 // @access Public
-const getBrand = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const brand = await BrandModel.findById(id);
-    if (!brand) {
-        return next(new ApiError(`Brand not found with id ${id}`, 404));
-    }
-    res.status(200).send({
-        message: 'Brand retrieved successfully',
-        data: {
-            brand
-        }
-    });
-});
+const getBrand = handlerFactory.getOne(BrandModel);
 
 // @desc Update a brand
 // @route PATCH /brands/:id
@@ -60,25 +23,7 @@ const deleteBrand = handlerFactory.deleteOne(BrandModel);
 // @desc Create a new brand
 // @route POST /brands
 // @access Public
-const addNewBrand = asyncHandler(
-    async (req, res, next) => {
-        const { name } = req.body;
-        const slug = slugify(name, { lower: true });
-        const brand = new BrandModel({
-            name,
-            slug,
-        });
-
-        await brand.save();
-        res.status(201).send({
-            message: 'Brand added successfully',
-            data: {
-                brand
-            }
-        },);
-    }
-);
-
+const addNewBrand = handlerFactory.createOne(BrandModel);
 module.exports = {
     getBrands,
     getBrand,

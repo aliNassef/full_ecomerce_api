@@ -4,8 +4,14 @@ const validatorMiddleware = require('../../middlewares/valdatorMiddleware');
 
 module.exports = {
     addNewBrandValidator: [
-        check('name').not().isEmpty().withMessage('Name is required'),
-
+        check('name')
+            .not()
+            .isEmpty()
+            .withMessage('Name is required')
+            .custom((val, { req }) => {
+                req.body.slug = slugify(val, { lower: true });
+                return true;
+            }),
         validatorMiddleware,
     ],
     updateBrandValidator: [

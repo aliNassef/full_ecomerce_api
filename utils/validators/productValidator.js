@@ -8,7 +8,11 @@ const productValidator = {
     addNewProductValidator: [
         check('title')
             .notEmpty()
-            .withMessage('Title is required'),
+            .withMessage('Title is required')
+            .custom((val, { req }) => {
+                req.body.slug = slugify(val, { lower: true });
+                return true;
+            }),
 
         check('description')
             .notEmpty()

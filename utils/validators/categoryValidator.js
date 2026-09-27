@@ -14,7 +14,11 @@ const addCategoryValidator = [
     check('name')
         .notEmpty().withMessage('category name is required')
         .isLength({ min: 3 }).withMessage('category name must be at least 3 characters')
-        .isLength({ max: 32 }).withMessage('category name must be less than 32 characters'),
+        .isLength({ max: 32 }).withMessage('category name must be less than 32 characters')
+        .custom((val, { req }) => {
+            req.body.slug = slugify(val, { lower: true });
+            return true;
+        }),
     validatorMiddleware,
 ];
 

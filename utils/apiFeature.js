@@ -77,11 +77,7 @@ class ApiFeature {
         return this;
     }
 
-    populate(path, select) {
-        this.mongooseQuery = this.mongooseQuery.populate(path, select);
 
-        return this;
-    }
 }
 
 
