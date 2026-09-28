@@ -11,7 +11,8 @@ router.use('/:categoryId/subCategory', subCategoryRouter);
 
 
 router.route('/')
-    .post(categoryValidator.addCategoryValidator, categoryController.addCategory)
+    .post(
+        categoryController.uploadCategoryImage, categoryValidator.addCategoryValidator, categoryController.addCategory)
     .get(categoryController.getCategories);
 
 router.route('/:id')

@@ -1,11 +1,42 @@
-const asyncHandler = require('express-async-handler');
-
-
+const multer = require('multer');
+const path = require('path');
+const handlerFactory = require('./handlerFactory');
 const CategoryModel = require('../models/categoryModel');
 
-const ApiFeature = require('../utils/apiFeature');
+const ApiError = require('../utils/apiError');
 
-const handlerFactory = require('./handlerFactory');
+const uploadPath = path.join(
+    process.cwd(),
+    'uploads',
+    'categories'
+);
+const multerStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const fileName = `Category-${Date.now()}.${ext}`;
+        cb(null, fileName);
+    }
+});
+
+const nulterFilter = (req, file, cb) => {
+
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    }
+    else {
+        cb(new ApiError('Only image files are allowed!'), false);
+    }
+
+};
+const upload = multer({ storage: multerStorage, fileFilter: nulterFilter });
+
+
+const uploadCategoryImage = upload.single('image');
+
+
 
 
 // @desc Add a new category
@@ -34,4 +65,4 @@ const deleteCategory = handlerFactory.deleteOne(CategoryModel);
 
 
 
-module.exports = { getCategories, addCategory, getCategory, updateCategory, deleteCategory };
+module.exports = { getCategories, addCategory, getCategory, updateCategory, deleteCategory, uploadCategoryImage };
