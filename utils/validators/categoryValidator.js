@@ -25,7 +25,7 @@ const addCategoryValidator = [
 const updateCategoryValidator = [
     check('id').isMongoId().withMessage('Invalid Category ID'),
     check('name')
-        .notEmpty().withMessage('category name is required')
+        .optional()
         .isLength({ min: 3 }).withMessage('category name must be at least 3 characters')
         .isLength({ max: 32 }).withMessage('category name must be less than 32 characters').custom((value, { req }) => {
             req.body.slug = slugify(value, { lower: true });

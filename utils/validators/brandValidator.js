@@ -16,7 +16,7 @@ module.exports = {
     ],
     updateBrandValidator: [
         check('id').isMongoId().withMessage('Invalid id'),
-        check('name').not().isEmpty().withMessage('Name is required').custom(((val, { req }) => {
+        check('name').optional().custom(((val, { req }) => {
             const slug = slugify(val, { lower: true });
             req.body.slug = slug;
             return true;
