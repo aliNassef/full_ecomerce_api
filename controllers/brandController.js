@@ -1,5 +1,35 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const path = require('path');
+const asyncHandler = require('express-async-handler');
+const sharp = require('sharp');
 const BrandModel = require('../models/brandModel');
 const handlerFactory = require('./handlerFactory');
+const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
+
+const uploadPath = path.join(
+    process.cwd(),
+    'uploads',
+    'brands'
+);
+
+const uploadBrandImage = uploadSingleImage('image');
+
+
+const resizeImage = asyncHandler(async (req, res, next) => {
+    console.log(req.file);
+    if (!req.file) {
+        return next();
+    }
+    const fileName = `Brand-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+        .resize({ width: 600, height: 600 })
+        .jpeg({ mozjpeg: true }).toFile(path.join(uploadPath, fileName));
+
+    // save image name in db
+    req.body.image = fileName;
+    next();
+
+});
 
 // @desc Get all brands
 // @route GET /brands
@@ -29,5 +59,7 @@ module.exports = {
     getBrand,
     updateBrand,
     deleteBrand,
-    addNewBrand
+    addNewBrand,
+    uploadBrandImage,
+    resizeImage
 };

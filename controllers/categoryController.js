@@ -1,43 +1,37 @@
-const multer = require('multer');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const sharp = require('sharp');
+const asyncHandler = require('express-async-handler');
+
 const path = require('path');
 const handlerFactory = require('./handlerFactory');
 const CategoryModel = require('../models/categoryModel');
-
-const ApiError = require('../utils/apiError');
+const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
 
 const uploadPath = path.join(
     process.cwd(),
     'uploads',
     'categories'
 );
-const multerStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadPath);
-    },
-    filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
-        const fileName = `Category-${Date.now()}.${ext}`;
-        cb(null, fileName);
+
+
+const uploadCategoryImage = uploadSingleImage('image');
+
+
+const resizeImage = asyncHandler(async (req, res, next) => {
+    console.log(req.file);
+    if (!req.file) {
+        return next();
     }
+    const fileName = `Category-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+        .resize({ width: 600, height: 600 })
+        .jpeg({ mozjpeg: true }).toFile(path.join(uploadPath, fileName));
+
+    // save image name in db
+    req.body.image = fileName;
+    next();
+
 });
-
-const nulterFilter = (req, file, cb) => {
-
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    }
-    else {
-        cb(new ApiError('Only image files are allowed!'), false);
-    }
-
-};
-const upload = multer({ storage: multerStorage, fileFilter: nulterFilter });
-
-
-const uploadCategoryImage = upload.single('image');
-
-
-
 
 // @desc Add a new category
 // @route POST /categories
@@ -65,4 +59,4 @@ const deleteCategory = handlerFactory.deleteOne(CategoryModel);
 
 
 
-module.exports = { getCategories, addCategory, getCategory, updateCategory, deleteCategory, uploadCategoryImage };
+module.exports = { getCategories, addCategory, getCategory, updateCategory, deleteCategory, uploadCategoryImage, resizeImage };

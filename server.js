@@ -3,10 +3,11 @@ const express = require('express');
 const morgan = require('morgan')
 const bodyParser = require('body-parser');
 require('dotenv').config({ path: 'config.env' });
+const qs = require('qs');
+const path = require('path');
 const databaseConfig = require('./config/database');
 
 const categoryRoutes = require('./routes/categoryRoutes');
-const qs = require('qs');
 
 const app = express();
 
@@ -26,6 +27,10 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(bodyParser.json());
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"))
+);
 
 databaseConfig();
 
