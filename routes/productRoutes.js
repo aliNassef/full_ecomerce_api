@@ -10,11 +10,11 @@ const router = express.Router();
 
 router.route('/')
     .get(productController.getAllProducts)
-    .post(productValidator.addNewProductValidator, productController.addProduct);
+    .post(productController.uploadMixedImage, productController.resizeImage, productValidator.addNewProductValidator, productController.addProduct);
 
 router.route('/:id')
     .get(productValidator.getProductValidator, productController.getProductById)
-    .patch(productValidator.updateProductValidator, productController.updateProduct)
+    .patch(productController.uploadMixedImage, productController.resizeImage, productValidator.updateProductValidator, productController.updateProduct)
     .delete(productValidator.deleteProductValidator, productController.deleteProduct);
 
 module.exports = router;

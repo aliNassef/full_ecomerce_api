@@ -1,6 +1,61 @@
+
+const sharp = require('sharp');
+const path = require('path');
+const asyncHandler = require('express-async-handler');
+
+
 const ProductModel = require('../models/productModel');
 
 const handlerFactory = require('./handlerFactory');
+
+
+const { uploadMixedImages } = require('../middlewares/uploadImageMiddleware');
+
+const uploadPath = path.join(
+    process.cwd(),
+    'uploads',
+    'products'
+);
+
+const uploadMixedImage = uploadMixedImages([
+    {
+        name: 'thumbnail',
+        maxCount: 1,
+    },
+    {
+        name: 'image',
+        maxCount: 5,
+    },
+]);
+
+const resizeImage = asyncHandler(async (req, res, next) => {
+    console.log(req.files);
+
+    if (req.files.thumbnail[0].buffer) {
+        const fileName = `Product-${Date.now()}.jpeg`;
+        await sharp(req.files.thumbnail[0].buffer)
+            .resize({ width: 600, height: 600 })
+            .jpeg({ mozjpeg: true }).toFile(path.join(uploadPath, fileName));
+        req.body.thumbnail = fileName;
+    }
+
+    if (req.files.image) {
+        const imaeges = [];
+        await Promise.all(
+            req.files.image.map(async (file) => {
+                if (file.buffer) {
+                    const fileName = `Product-${Date.now()}.jpeg`;
+                    await sharp(file.buffer)
+                        .resize({ width: 600, height: 600 })
+                        .jpeg({ mozjpeg: true }).toFile(path.join(uploadPath, fileName));
+
+                    imaeges.push(fileName);
+                }
+            }));
+        req.body.image = imaeges;
+    }
+    next();
+});
 
 // @desc Get all products
 // @route GET /api/V1/products
@@ -34,4 +89,6 @@ module.exports = {
     addProduct,
     updateProduct,
     deleteProduct,
+    uploadMixedImage,
+    resizeImage,
 };
