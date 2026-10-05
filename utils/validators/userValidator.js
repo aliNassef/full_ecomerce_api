@@ -61,8 +61,7 @@ module.exports = {
             return true;
         })),
         check('email')
-            .notEmpty()
-            .withMessage('Email is required')
+            .optional()
             .isEmail()
             .withMessage('Email is invalid')
             .custom(async (val) => {
@@ -83,5 +82,20 @@ module.exports = {
     deleteUserValidator: [
         check('id').isMongoId().withMessage('Invalid id'),
         validatorMiddleware
+    ],
+
+    changePasswordValidator: [
+        check('id').isMongoId().withMessage('Invalid id'),
+        check('password').notEmpty().withMessage('Password is required')
+            .custom((pass, { req }) => {
+                console.log(pass, req.body.passwordConfirm);
+                if (pass !== req.body.passwordConfirm) {
+                    throw new Error('Password does not match password confirmation');
+                }
+
+                return true;
+            }),
+        check('passwordConfirm').notEmpty().withMessage('Password confirmation is required'),
+        validatorMiddleware,
     ],
 };

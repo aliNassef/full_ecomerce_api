@@ -7,10 +7,19 @@ const userController = require('../controllers/userController');
 const userValidator = require('../utils/validators/userValidator');
 
 
+router.patch(
+    '/change-password/:id',
+    userValidator.changePasswordValidator,
+    userController.changePassword
+);
+
 
 router.route('/')
     .get(userController.getUsers)
-    .post(userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, userController.addUser);
+    .post(userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, (req, res, next) => {
+        console.log(req.body);
+        next();
+    }, userController.addUser);
 
 router.route('/:id')
     .get(userValidator.getUserValidator, userController.getUserById)
