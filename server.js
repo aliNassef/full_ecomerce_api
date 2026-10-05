@@ -21,6 +21,8 @@ const brandRoutes = require('./routes/brandRoutes');
 
 const productRoutes = require('./routes/productRoutes');
 
+const userRoutes = require('./routes/userRoute');
+
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
     console.log('Development mode is on');
@@ -38,6 +40,7 @@ app.use('/api/V1/category', categoryRoutes);
 app.use('/api/V1/subCategory', subCategoryRoutes);
 app.use('/api/V1/brands', brandRoutes);
 app.use('/api/V1/products', productRoutes);
+app.use('/api/V1/users', userRoutes);
 app.all('/{*splat}', (req, res, next) => {
     next(new ApiError(`Not Found ${req.originalUrl}`, 404));
 });
