@@ -1,4 +1,6 @@
 const slugify = require('slugify');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require('bcryptjs');
 const { check } = require('express-validator');
 const validatorMiddleware = require('../../middlewares/valdatorMiddleware');
 const UserModel = require('../../models/userModel');
@@ -73,6 +75,14 @@ module.exports = {
 
                 return true;
             }),
+        check('profileImage')
+            .optional(),
+        check('role')
+            .notEmpty()
+            .withMessage('Role is required'),
+        check('phone')
+            .optional()
+            .isMobilePhone(["ar-EG", "ar-SA"]),
         validatorMiddleware,
     ],
     getUserValidator: [
@@ -92,10 +102,26 @@ module.exports = {
                 if (pass !== req.body.passwordConfirm) {
                     throw new Error('Password does not match password confirmation');
                 }
-
+                if (pass === req.body.currentPassword) {
+                    throw new Error('Current password is same as new password');
+                }
                 return true;
             }),
         check('passwordConfirm').notEmpty().withMessage('Password confirmation is required'),
+        check('currentPassword').notEmpty().withMessage('Current password is required').custom(async (val, { req }) => {
+
+            const user = await UserModel.findById(req.params.id);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            const isPasswordMatch = await bcrypt.compare(val, user.password);
+            if (!isPasswordMatch) {
+                throw new Error('Current password is invalid');
+            }
+
+            return true;
+        }),
         validatorMiddleware,
     ],
 };
