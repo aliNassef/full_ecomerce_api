@@ -65,7 +65,6 @@ const updateUser = asyncHandler(async (req, res, next) => {
     if (!document) {
         return next(new ApiError(`document not found with id ${req.params.id}`, 404));
     }
-
     res.status(200).send({
         message: 'document updated successfully',
         data: {
@@ -81,6 +80,7 @@ const changePassword = asyncHandler(async (req, res, next) => {
 
     const document = await UserModel.findByIdAndUpdate(req.params.id, {
         password: await bcrypt.hash(req.body.password, 12),
+        passwordChanged: Date.now(),
     }, { new: true });
     if (!document) {
         return next(new ApiError(`document not found with id ${req.params.id}`, 404));

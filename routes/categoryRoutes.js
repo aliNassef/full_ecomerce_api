@@ -7,12 +7,14 @@ const categoryValidator = require('../utils/validators/categoryValidator');
 
 const subCategoryRouter = require('./subCategoryRoutes');
 
+const authController = require('../controllers/authController');
+
 router.use('/:categoryId/subCategory', subCategoryRouter);
 
 
 router.route('/')
     .post(
-        categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.addCategoryValidator, categoryController.addCategory)
+        authController.authGate, categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.addCategoryValidator, categoryController.addCategory)
     .get(categoryController.getCategories);
 
 router.route('/:id')
