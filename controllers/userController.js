@@ -80,7 +80,7 @@ const changePassword = asyncHandler(async (req, res, next) => {
 
     const document = await UserModel.findByIdAndUpdate(req.params.id, {
         password: await bcrypt.hash(req.body.password, 12),
-        passwordChanged: Date.now(),
+        passwordChangedAt: Date.now(),
     }, { new: true });
     if (!document) {
         return next(new ApiError(`document not found with id ${req.params.id}`, 404));

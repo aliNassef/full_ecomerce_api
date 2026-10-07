@@ -67,21 +67,32 @@ const login = asyncHandler(async (req, res, next) => {
 // @access Private
 
 const authGate = asyncHandler(async (req, res, next) => {
-
+    // check if token exist in req
     let token = req.headers.authorization;
     token = token.split(' ')[1];
-    console.log(token);
+
     if (!token) {
         return next(new ApiError('Unauthorized , Please login first then try again', 401));
     }
+    // verify token
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decode);
+    // check if user exist in db
     const user = await UserModel.findById(decode.id);
+
     if (!user) {
         return next(new ApiError('Unauthorized , Please login first then try again', 401));
     }
 
+    if (user.passwordChangedAt) {
+        const passChangedTime = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
+        console.log(passChangedTime, decode.iat);
+        if (passChangedTime > decode.iat) {
+            return next(new ApiError('Unauthorized , Please login first then try again', 401));
+        }
+    }
 
+    req.user = user;
+    next();
 });
 
 module.exports = {
