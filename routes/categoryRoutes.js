@@ -14,13 +14,13 @@ router.use('/:categoryId/subCategory', subCategoryRouter);
 
 router.route('/')
     .post(
-        authController.authGate, categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.addCategoryValidator, categoryController.addCategory)
+        authController.authGate, authController.verifyTo('admin', 'manager'), categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.addCategoryValidator, categoryController.addCategory)
     .get(categoryController.getCategories);
 
 router.route('/:id')
     .get(categoryValidator.getCategoryByIdValidator, categoryController.getCategory)
-    .patch(categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.updateCategoryValidator, categoryController.updateCategory)
-    .delete(categoryValidator.deleteCategoryValidator, categoryController.deleteCategory);
+    .patch(authController.authGate, authController.verifyTo('admin', 'manager'), categoryController.uploadCategoryImage, categoryController.resizeImage, categoryValidator.updateCategoryValidator, categoryController.updateCategory)
+    .delete(authController.authGate, authController.verifyTo('admin', 'manager'), categoryValidator.deleteCategoryValidator, categoryController.deleteCategory);
 
 
 

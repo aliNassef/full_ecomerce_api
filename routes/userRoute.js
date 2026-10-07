@@ -6,6 +6,7 @@ const userController = require('../controllers/userController');
 
 const userValidator = require('../utils/validators/userValidator');
 
+const authController = require('../controllers/authController');
 
 router.patch(
     '/change-password/:id',
@@ -15,15 +16,12 @@ router.patch(
 
 
 router.route('/')
-    .get(userController.getUsers)
-    .post(userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, (req, res, next) => {
-        console.log(req.body);
-        next();
-    }, userController.addUser);
+    .get(authController.authGate, authController.verifyTo('admin'), userController.getUsers)
+    .post(authController.authGate, authController.verifyTo('admin'), userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, userController.addUser);
 
 router.route('/:id')
-    .get(userValidator.getUserValidator, userController.getUserById)
-    .patch(userController.uploadUserImage, userController.resizeImage, userValidator.updateUserValidator, userController.updateUser)
-    .delete(userValidator.deleteUserValidator, userController.deleteUser);
+    .get(authController.authGate, authController.verifyTo('admin'), userValidator.getUserValidator, userController.getUserById)
+    .patch(authController.authGate, authController.verifyTo('admin'), userController.uploadUserImage, userController.resizeImage, userValidator.updateUserValidator, userController.updateUser)
+    .delete(authController.authGate, authController.verifyTo('admin'), userValidator.deleteUserValidator, userController.deleteUser);
 
 module.exports = router;

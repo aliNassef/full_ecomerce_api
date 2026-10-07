@@ -64,7 +64,7 @@ const login = asyncHandler(async (req, res, next) => {
 
 
 // @desc  verify user logged in
-// @access Private
+// @access Public
 
 const authGate = asyncHandler(async (req, res, next) => {
     // check if token exist in req
@@ -85,7 +85,6 @@ const authGate = asyncHandler(async (req, res, next) => {
 
     if (user.passwordChangedAt) {
         const passChangedTime = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
-        console.log(passChangedTime, decode.iat);
         if (passChangedTime > decode.iat) {
             return next(new ApiError('Unauthorized , Please login first then try again', 401));
         }
@@ -95,8 +94,20 @@ const authGate = asyncHandler(async (req, res, next) => {
     next();
 });
 
+
+const verifyTo = (...roles) => asyncHandler(async (req, res, next) => {
+
+    if (!roles.includes(req.user.role)) {
+        return next(new ApiError('not allowed to access this route', 403));
+    }
+
+    next();
+});
+
+
 module.exports = {
     signup,
     login,
-    authGate
+    authGate,
+    verifyTo
 };

@@ -6,15 +6,16 @@ const subCategoryController = require('../controllers/subCategoryController');
 
 const subCategoryValidator = require('../utils/validators/subCategoryValidator');
 
+const authController = require('../controllers/authController');
 
 router.route('/')
     .get(subCategoryController.createfilteredObject, subCategoryController.getSubCategories)
-    .post(subCategoryController.setCategoryId, subCategoryValidator.addSubCategoryValidator, subCategoryController.addNewSubCategory);
+    .post(authController.authGate, authController.verifyTo('admin'), subCategoryController.setCategoryId, subCategoryValidator.addSubCategoryValidator, subCategoryController.addNewSubCategory);
 
 router.route('/:id')
     .get(subCategoryValidator.getSubCategoryyByIdValidator, subCategoryController.getSubCategory)
-    .patch(subCategoryValidator.updateSubCategoryValidator, subCategoryController.updateSubCategory)
-    .delete(subCategoryValidator.deleteSubCategoryValidator, subCategoryController.deleteSubCategory);
+    .patch(authController.authGate, authController.verifyTo('admin'), subCategoryValidator.updateSubCategoryValidator, subCategoryController.updateSubCategory)
+    .delete(authController.authGate, authController.verifyTo('admin'), subCategoryValidator.deleteSubCategoryValidator, subCategoryController.deleteSubCategory);
 
 
 module.exports = router;
