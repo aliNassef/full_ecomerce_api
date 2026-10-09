@@ -43,4 +43,15 @@ module.exports = {
             .withMessage('Password is required'),
         validatorMiddleware,
     ],
+
+    forgetPasswordValidator: [
+        check('email')
+            .trim()
+            .notEmpty()
+            .withMessage('Email is required')
+            .isEmail()
+            .withMessage('Email is invalid')
+            .toLowerCase(),
+        validatorMiddleware,
+    ],
 }
