@@ -85,6 +85,31 @@ module.exports = {
             .isMobilePhone(["ar-EG", "ar-SA"]),
         validatorMiddleware,
     ],
+    updateUserLoggedValidator: [
+        check('name').optional().custom(((val, { req }) => {
+            const slug = slugify(val, { lower: true });
+            req.body.slug = slug;
+            return true;
+        })),
+        check('email')
+            .optional()
+            .isEmail()
+            .withMessage('Email is invalid')
+            .custom(async (val) => {
+                const user = await UserModel.findOne({ email: val });
+
+                if (user) {
+                    throw new Error('Email already exists');
+                }
+
+                return true;
+            }),
+
+        check('phone')
+            .optional()
+            .isMobilePhone(["ar-EG", "ar-SA"]),
+        validatorMiddleware,
+    ],
     getUserValidator: [
         check('id').isMongoId().withMessage('Invalid id'),
         validatorMiddleware,

@@ -132,6 +132,41 @@ const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
         token
     });
 });
+
+// @desc Deactivate user
+// @route Delete /api/V1/users/deactivate
+// @access Private/protected
+const deactivateUser = asyncHandler(async (req, res, next) => {
+    await UserModel.findByIdAndUpdate(req.user._id, {
+        isActive: false,
+        isActiveChangedAt: Date.now(),
+    });
+    res.status(204).send({
+        message: 'user deactivated successfully',
+
+    });
+});
+
+// @desc Update user data without password, role
+// @route Patch /api/V1/users/updateMe
+// @access Private/protected
+const updateLoggedUserData = asyncHandler(async (req, res, next) => {
+    const user = await UserModel.findByIdAndUpdate(req.user._id, {
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+        slug: req.body.slug,
+    },
+        { new: true });
+
+    res.status(200).send({
+        message: 'user updated successfully',
+        data: {
+            user
+        },
+
+    });
+});
 module.exports = {
     getUsers,
     getUserById,
@@ -142,7 +177,9 @@ module.exports = {
     resizeImage,
     changePassword,
     getMyProfile,
-    updateLoggedUserPassword
+    updateLoggedUserPassword,
+    deactivateUser,
+    updateLoggedUserData
 };
 
 

@@ -8,11 +8,15 @@ const userValidator = require('../utils/validators/userValidator');
 
 const authController = require('../controllers/authController');
 
-router.get('/my-profile', authController.authGate, userController.getMyProfile, userController.getUserById);
-router.patch('/updateLoggedUserPassword', authController.authGate, userController.updateLoggedUserPassword);
+
+router.use(authController.authGate);
+router.get('/my-profile', userController.getMyProfile, userController.getUserById);
+router.patch('/updateLoggedUserPassword', userController.updateLoggedUserPassword);
+router.patch('/updateMe', userValidator.updateUserLoggedValidator, userController.updateLoggedUserData);
+router.delete('/deleteMe', userController.deactivateUser);
 
 
-router.use(authController.authGate, authController.verifyTo('admin'));
+router.use(authController.verifyTo('admin'));
 
 router.patch(
     '/change-password/:id',
