@@ -151,10 +151,60 @@ const forgetPassword = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc verify reset password code
+// @route Post /auth/verifyResetPasswordCode
+// @access Public
+const verifyResetPasswordCode = asyncHandler(async (req, res, next) => {
+    const { resetCode, email } = req.body;
+    const user = await UserModel.findOne({ email, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+        return next(new ApiError(`User not found with this email ${email}`, 404));
+    }
+
+    const hashedResetCode = crypto.createHash('sha256').update(resetCode).digest('hex');
+
+    if (hashedResetCode !== user.resetPasswordCode || user.resetPasswordVerification) {
+        return next(new ApiError('Invalid reset code Or Expired reset code', 401));
+    }
+
+    user.resetPasswordVerification = true;
+    await user.save();
+    res.status(200).send({
+        message: 'Reset code verified successfully',
+    });
+});
+
+
+// @desc reset password
+// @route Patch /auth/resetPassword
+// @access Public
+const resetPassword = asyncHandler(async (req, res, next) => {
+    const { newPassword, email } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+        return next(new ApiError(`User not found with this email ${email}`, 404));
+    }
+    if (!user.resetPasswordVerification) {
+        return next(new ApiError('Reset code is not verified yet', 401));
+    }
+
+    user.password = newPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    user.resetPasswordVerification = undefined;
+    await user.save();
+    res.status(200).send({
+        message: 'Password reset successfully',
+        token: generateToken(user._id),
+    });
+});
+
 module.exports = {
     signup,
     login,
     authGate,
     verifyTo,
-    forgetPassword
+    forgetPassword,
+    verifyResetPasswordCode,
+    resetPassword
 };

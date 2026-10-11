@@ -54,4 +54,17 @@ module.exports = {
             .toLowerCase(),
         validatorMiddleware,
     ],
+    verifyResetPasswordCode: [
+        check('email')
+            .trim()
+            .notEmpty()
+            .withMessage('Email is required')
+            .isEmail()
+            .withMessage('Email is invalid')
+            .toLowerCase(),
+        check('newPassword')
+            .notEmpty()
+            .withMessage('Password is required'),
+        validatorMiddleware,
+    ],
 }
