@@ -8,20 +8,25 @@ const userValidator = require('../utils/validators/userValidator');
 
 const authController = require('../controllers/authController');
 
+router.get('/my-profile', authController.authGate, userController.getMyProfile, userController.getUserById);
+router.patch('/updateLoggedUserPassword', authController.authGate, userController.updateLoggedUserPassword);
+
+
+router.use(authController.authGate, authController.verifyTo('admin'));
+
 router.patch(
     '/change-password/:id',
     userValidator.changePasswordValidator,
     userController.changePassword
 );
 
-
 router.route('/')
-    .get(authController.authGate, authController.verifyTo('admin'), userController.getUsers)
-    .post(authController.authGate, authController.verifyTo('admin'), userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, userController.addUser);
+    .get(userController.getUsers)
+    .post(userController.uploadUserImage, userController.resizeImage, userValidator.addNewUserValidator, userController.addUser);
 
 router.route('/:id')
-    .get(authController.authGate, authController.verifyTo('admin'), userValidator.getUserValidator, userController.getUserById)
-    .patch(authController.authGate, authController.verifyTo('admin'), userController.uploadUserImage, userController.resizeImage, userValidator.updateUserValidator, userController.updateUser)
-    .delete(authController.authGate, authController.verifyTo('admin'), userValidator.deleteUserValidator, userController.deleteUser);
+    .get(userValidator.getUserValidator, userController.getUserById)
+    .patch(userController.uploadUserImage, userController.resizeImage, userValidator.updateUserValidator, userController.updateUser)
+    .delete(userValidator.deleteUserValidator, userController.deleteUser);
 
 module.exports = router;

@@ -9,12 +9,7 @@ const UserModel = require('../models/userModel');
 const ApiError = require('../utils/apiError');
 
 const sendEmail = require('../utils/emailSender');
-
-const generateToken = (payload) =>
-    jwt.sign({ id: payload }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-
+const generateToken = require('../utils/generateToken');
 // @desc Signup 
 // @route Post /auth/signup
 // @access Public

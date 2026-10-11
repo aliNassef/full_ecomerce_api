@@ -10,6 +10,8 @@ const UserModel = require('../models/userModel');
 const ApiError = require('../utils/apiError');
 const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
 
+const generateToken = require('../utils/generateToken');
+
 const uploadPath = path.join(
     process.cwd(),
     'uploads',
@@ -99,6 +101,37 @@ const changePassword = asyncHandler(async (req, res, next) => {
 // @access Private
 const deleteUser = handlerFactory.deleteOne(UserModel);
 
+
+// @desc Get user profile
+// @route GET /api/V1/users/my-profile
+// @access Private/protected
+const getMyProfile = asyncHandler(async (req, res, next) => {
+    req.params.id = req.user._id;
+    next();
+});
+
+// @desc update user password
+// @route PATCH /api/V1/users/my-profile/password
+// @access Private/protected
+const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+
+    const user = await UserModel.findByIdAndUpdate(req.user._id, {
+        password: await bcrypt.hash(req.body.password, 12),
+        passwordChangedAt: Date.now(),
+    }, { new: true });
+    if (!user) {
+        return next(new ApiError(`user not found with id ${req.user._id}`, 404));
+    }
+    const token = generateToken(user._id);
+
+    res.status(200).send({
+        message: 'user updated successfully',
+        data: {
+            user
+        },
+        token
+    });
+});
 module.exports = {
     getUsers,
     getUserById,
@@ -107,7 +140,9 @@ module.exports = {
     deleteUser,
     uploadUserImage,
     resizeImage,
-    changePassword
+    changePassword,
+    getMyProfile,
+    updateLoggedUserPassword
 };
 
 
