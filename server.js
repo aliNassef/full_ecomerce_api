@@ -23,6 +23,7 @@ const productRoutes = require('./routes/productRoutes');
 
 const userRoutes = require('./routes/userRoute');
 const authRoutes = require('./routes/authRoutes');
+const reviewRoutes = require('./routes/reviewRoute');
 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
@@ -43,6 +44,7 @@ app.use('/api/V1/brands', brandRoutes);
 app.use('/api/V1/products', productRoutes);
 app.use('/api/V1/users', userRoutes);
 app.use('/api/V1/auth', authRoutes);
+app.use('/api/V1/reviews', reviewRoutes);
 app.all('/{*splat}', (req, res, next) => {
     next(new ApiError(`Not Found ${req.originalUrl}`, 404));
 });
