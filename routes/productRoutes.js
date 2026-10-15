@@ -7,6 +7,9 @@ const router = express.Router();
 
 const authController = require('../controllers/authController');
 
+const reviewrouter = require('./reviewRoute');
+
+router.use('/:id/reviews', reviewrouter);
 
 router.route('/')
     .get(productController.getAllProducts)

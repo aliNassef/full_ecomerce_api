@@ -10,18 +10,22 @@ const reviewSchema = new mongoose.Schema({
         max: [5, 'Rating must be less than 5'],
         required: [true, 'Rating must be provided to review'],
     },
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'User must be provided to review'],
     },
-    productId: {
+    product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
         required: [true, 'Product must be provided to review'],
     },
 }, {
     timestamps: true
+});
+
+reviewSchema.pre(/^find/, function () {
+    this.populate('user', 'name');
 });
 
 

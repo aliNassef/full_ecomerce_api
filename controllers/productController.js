@@ -67,7 +67,7 @@ const getAllProducts = handlerFactory.getAll(ProductModel);
 // @desc Get product by id
 // @route GET /api/V1/products/:id
 // @access Public
-const getProductById = handlerFactory.getOne(ProductModel);
+const getProductById = handlerFactory.getOne(ProductModel, 'reviews');
 
 
 // @desc Add new product

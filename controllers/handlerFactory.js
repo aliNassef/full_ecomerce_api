@@ -48,9 +48,14 @@ const createOne = (Model) => asyncHandler(
 
 
 
-const getOne = (Model) => asyncHandler(async (req, res, next) => {
+const getOne = (Model, populateOpt) => asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const document = await Model.findById(id);
+    let query = Model.findById(id);
+    if (populateOpt) {
+        query = query.populate(populateOpt);
+    }
+
+    const document = await query;
     if (!document) {
         return next(new ApiError(`document not found with id ${id}`, 404));
     }

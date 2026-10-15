@@ -68,7 +68,16 @@ const productSchema = new mongoose.Schema({
     colors: {
         type: [String],
     },
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true
+    }
+    ,
+    toObject: {
+        virtuals: true
+    }
+});
 
 
 
@@ -76,6 +85,13 @@ const productSchema = new mongoose.Schema({
 productSchema.pre(/^find/, async function () {
     this.populate('category', 'name');
 
+});
+
+
+productSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'product',
 });
 
 const setImageUrl = (doc) => {

@@ -2,6 +2,20 @@ const handlerFactory = require('./handlerFactory');
 const ReviewModel = require('../models/reviewModel');
 
 
+const setProductIdAndUserId = (req, res, next) => {
+    if (!req.body.product) req.body.product = req.params.id;
+    if (!req.body.user) req.body.user = req.user._id;
+    next();
+};
+
+const createfilteredObject = (req, res, next) => {
+    let filteredObject = {};
+    if (req.params.id) filteredObject = { product: req.params.id };
+
+    req.filteredObject = filteredObject;
+    next();
+};
+
 // @desc Get all reviews
 // @route GET /api/V1/reviews
 // @access Public
@@ -32,5 +46,7 @@ module.exports = {
     getReviewById,
     addReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    setProductIdAndUserId,
+    createfilteredObject
 };
