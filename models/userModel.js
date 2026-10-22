@@ -45,6 +45,13 @@ const userSchema = new mongoose.Schema({
     resetPasswordCode: String,
     resetPasswordExpires: Date,
     resetPasswordVerification: Boolean,
+    wishlist: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+            required: [true, 'Product must be provided to wishlist'],
+        }
+    ]
 }, {
     timestamps: true,
 });
@@ -59,6 +66,7 @@ userSchema.pre('save', async function () {
 
 
 });
+
 
 module.exports = mongoose.model('User', userSchema);
 
