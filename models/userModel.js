@@ -51,6 +51,16 @@ const userSchema = new mongoose.Schema({
             ref: 'Product',
             required: [true, 'Product must be provided to wishlist'],
         }
+    ],
+    address: [
+        {
+            id: mongoose.Schema.Types.ObjectId,
+            details: String,
+            alias: String,
+            city: String,
+            postalCode: String,
+            phone: String,
+        }
     ]
 }, {
     timestamps: true,
