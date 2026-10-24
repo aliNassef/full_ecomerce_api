@@ -21,6 +21,7 @@ const signup = asyncHandler(async (req, res) => {
             slug: slugify(req.body.name || '', { lower: true }),
             email: req.body.email,
             password: req.body.password,
+            role: req.body.role
         }
     );
 

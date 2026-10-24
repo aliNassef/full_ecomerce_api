@@ -6,8 +6,7 @@ require('dotenv').config({ path: 'config.env' });
 const qs = require('qs');
 const path = require('path');
 const databaseConfig = require('./config/database');
-
-const categoryRoutes = require('./routes/categoryRoutes');
+const mountRoutes = require('./routes');
 
 const app = express();
 
@@ -15,17 +14,6 @@ app.set('query parser', (str) => qs.parse(str));
 const ApiError = require('./utils/apiError');
 const globalErrorHandling = require('./middlewares/errMiddleware');
 
-const subCategoryRoutes = require('./routes/subCategoryRoutes');
-
-const brandRoutes = require('./routes/brandRoutes');
-
-const productRoutes = require('./routes/productRoutes');
-
-const userRoutes = require('./routes/userRoute');
-const authRoutes = require('./routes/authRoutes');
-const reviewRoutes = require('./routes/reviewRoute');
-const wishlistRoutes = require('./routes/wishlistRoutes');
-const addressRoutes = require('./routes/addressRoutes');
 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
@@ -40,15 +28,8 @@ app.use(
 
 databaseConfig();
 
-app.use('/api/V1/category', categoryRoutes);
-app.use('/api/V1/subCategory', subCategoryRoutes);
-app.use('/api/V1/brands', brandRoutes);
-app.use('/api/V1/products', productRoutes);
-app.use('/api/V1/users', userRoutes);
-app.use('/api/V1/auth', authRoutes);
-app.use('/api/V1/reviews', reviewRoutes);
-app.use('/api/V1/wishlist', wishlistRoutes);
-app.use('/api/V1/addresses', addressRoutes);
+mountRoutes(app);
+
 app.all('/{*splat}', (req, res, next) => {
     next(new ApiError(`Not Found ${req.originalUrl}`, 404));
 });
