@@ -12,6 +12,8 @@ router.route('/')
     .get(cartController.getCart)
     .delete(cartController.clearCart);
 
+router.patch('/applyCoupon', cartController.applyCoupon);
+
 router.route('/:itemId')
     .delete(cartValidator.deleteProductFromCartValidator, cartController.deleteCartItemFromCart)
     .patch(cartValidator.updateProductQuantityValidator, cartController.updateProductQuantityInCart);
