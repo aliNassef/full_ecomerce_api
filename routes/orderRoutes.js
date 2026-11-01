@@ -13,6 +13,8 @@ router.get('/:id', authController.verifyTo('user'), orderController.getOrder);
 
 router.post('/:cartId', authController.verifyTo('user'), orderController.createCashOrder);
 
+router.patch('/:id/pay', authController.verifyTo('admin'), orderController.updateOrderToPaid);
+router.patch('/:id/deliverd', authController.verifyTo('admin'), orderController.updateOrderToDelivred);
 
 
 module.exports = router;

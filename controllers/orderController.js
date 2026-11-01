@@ -81,9 +81,52 @@ const getOrders = handlerFactory.getAll(OrderModel)
 const getOrder = handlerFactory.getOne(OrderModel)
 
 
+///  @desc  Change Order Status To Paid
+///  @router Patch /api/v1/orders/:id/pay
+///  @access Private / Admin
+const updateOrderToPaid = asyncHandler(async (req, res, next) => {
+    const order = await OrderModel.findById(req.params.id);
+    if (!order) {
+        return next(new ApiError('Order Not Found', 404));
+    }
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    const updatedOrder = await order.save();
+    res.status(200).send(
+        {
+            status: "success",
+            message: "Order Updated Succesfully",
+            data: updatedOrder
+        }
+    );
+});
+
+
+///  @desc  Change Order Status To Delivred
+///  @router Patch /api/v1/orders/:id/delivred
+///  @access Private / Admin
+const updateOrderToDelivred = asyncHandler(async (req, res, next) => {
+    const order = await OrderModel.findById(req.params.id);
+    if (!order) {
+        return next(new ApiError('Order Not Found', 404));
+    }
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    const updatedOrder = await order.save();
+    res.status(200).send(
+        {
+            status: "success",
+            message: "Order Updated Succesfully",
+            data: updatedOrder
+        }
+    );
+});
+
 module.exports = {
     createCashOrder,
     getOrders,
     getOrder,
-    filterOrder
+    filterOrder,
+    updateOrderToPaid,
+    updateOrderToDelivred
 };

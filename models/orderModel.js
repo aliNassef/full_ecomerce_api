@@ -60,6 +60,17 @@ const orderSchema = new mongoose.Schema({
         timestamps: true,
     }
 );
+orderSchema.pre(/^find/, async function () {
+    this.populate({
+        path: 'user',
+        select: 'name email phone profileImage',
+    });
+
+    this.populate({
+        path: 'cartItems.product',
+        select: 'title thumbnail',
+    });
+});
 
 
 module.exports = mongoose.model('Order', orderSchema);
