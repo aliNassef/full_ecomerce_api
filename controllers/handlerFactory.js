@@ -73,7 +73,7 @@ const getAll = (Model, searchKeys) => asyncHandler(async (req, res, next) => {
     if (req.filteredObject) {
         filter = req.filteredObject;
     }
-    const documentCount = await Model.countDocuments();
+    const documentCount = await Model.countDocuments(filter);
     const apiFeature = new ApiFeature(Model.find(filter), req.query)
         .filter()
         .search(searchKeys)
