@@ -8,6 +8,7 @@ const authController = require('../controllers/authController');
 
 router.use(authController.authGate);
 
+router.post('/checkout-session/:cartId', authController.verifyTo('user'), orderController.checkoutSession);
 router.get('/', authController.verifyTo('admin', 'user'), orderController.filterOrder, orderController.getOrders);
 router.get('/:id', authController.verifyTo('user'), orderController.getOrder);
 
