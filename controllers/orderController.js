@@ -173,7 +173,31 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
 
 });
 
+const createOrderCard = asyncHandler(async (req, res, next) => {
 
+    console.log('Create ORDER -------------------------------------');
+
+});
+
+const orderCheckout = asyncHandler(async (req, res, next) => {
+    const signature = req.headers['stripe-signature'];
+    let notification;
+    try {
+        // Verify the signature and parse the thin event notification
+        notification = stripe.parseEventNotification(
+            req.body,
+            signature,
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
+    } catch (err) {
+        console.log(`Webhook signature verification failed.`, err.message);
+        return res.sendStatus(400);
+    }
+
+    if (notification.type === "checkout.session.completed") {
+        createOrderCard();
+    }
+});
 module.exports = {
     createCashOrder,
     getOrders,
@@ -181,5 +205,6 @@ module.exports = {
     filterOrder,
     updateOrderToPaid,
     updateOrderToDelivred,
-    checkoutSession
+    checkoutSession,
+    orderCheckout
 };

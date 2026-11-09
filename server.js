@@ -11,12 +11,17 @@ const databaseConfig = require('./config/database');
 // eslint-disable-next-line import/no-extraneous-dependencies, import/order
 const cors = require('cors')
 const mountRoutes = require('./routes');
+const orderCheckout = require('./controllers/orderController');
 
 const app = express();
 app.use(cors());
 app.options('/{*splat}', cors());
 app.use(compression());
 app.set('query parser', (str) => qs.parse(str));
+
+
+app.post('/order-checkout', express.raw({ type: 'application/json' }), orderCheckout);
+
 const ApiError = require('./utils/apiError');
 const globalErrorHandling = require('./middlewares/errMiddleware');
 
