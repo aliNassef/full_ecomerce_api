@@ -175,7 +175,6 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
 
 const createOrderCard = asyncHandler(async (req, res, next) => {
 
-    console.log('Create ORDER -------------------------------------');
 
 });
 
@@ -195,6 +194,8 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
     }
 
     if (notification.type === "checkout.session.completed") {
+        console.log('Create ORDER -------------------------------------');
+
         createOrderCard();
     }
 });
