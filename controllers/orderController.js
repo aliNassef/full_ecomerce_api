@@ -196,7 +196,7 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
     if (notification.type === "checkout.session.completed") {
         console.log('Create ORDER -------------------------------------');
 
-        createOrderCard();
+
     }
 });
 module.exports = {
