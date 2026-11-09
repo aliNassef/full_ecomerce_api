@@ -11,7 +11,7 @@ const databaseConfig = require('./config/database');
 // eslint-disable-next-line import/no-extraneous-dependencies, import/order
 const cors = require('cors')
 const mountRoutes = require('./routes');
-const orderCheckout = require('./controllers/orderController');
+const { orderCheckout } = require('./controllers/orderController');
 
 const app = express();
 app.use(cors());
