@@ -173,31 +173,72 @@ const checkoutSession = asyncHandler(async (req, res, next) => {
 
 });
 
-const createOrderCard = asyncHandler(async (req, res, next) => {
+// Creates a paid card order from a completed checkout session (see checkoutSession above).
+const createCardOrder = async (session) => {
+    // async payment methods can complete checkout before the money arrives
+    if (session.payment_status !== 'paid') return null;
 
+    const cartId = session.client_reference_id;
+    const { details, phone, city } = session.metadata;
+    const totalOrderPrice = session.amount_total / 100;
 
-});
+    // the cart is deleted once its order exists, so a retried event finds nothing to do
+    const cart = await CartModel.findById(cartId);
+    if (!cart) return null;
 
+    const order = await OrderModel.create({
+        user: cart.user,
+        cartItems: cart.cartItems,
+        shippingAddress: { details, phone, city },
+        totalOrderPrice,
+        paymentMethodType: 'card',
+        isPaid: true,
+        paidAt: Date.now(),
+    });
+
+    const bulkOption = cart.cartItems.map((item) => ({
+        updateOne: {
+            filter: { _id: item.product },
+            update: {
+                $inc: {
+                    sold: +item.quantity,
+                    stock: -item.quantity
+                },
+            },
+        },
+    }));
+    await ProductModel.bulkWrite(bulkOption);
+
+    await CartModel.findByIdAndDelete(cartId);
+
+    return order;
+};
+
+/// @desc   Stripe webhook: create the order once checkout is paid
+/// @router POST /order-checkout
+/// @access Public (verified by Stripe signature)
 const orderCheckout = asyncHandler(async (req, res, next) => {
     const signature = req.headers['stripe-signature'];
-    let notification;
+    let event;
     try {
-        // Verify the signature and parse the thin event notification
-        notification = stripe.parseEventNotification(
+        // req.body must be the raw Buffer from express.raw() in server.js, or the signature check fails
+        event = stripe.webhooks.constructEvent(
             req.body,
             signature,
             process.env.STRIPE_WEBHOOK_SECRET
         );
     } catch (err) {
-        console.log(`Webhook signature verification failed.`, err.message);
-        return res.sendStatus(400);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (notification.type === "checkout.session.completed") {
+    if (event.type === 'checkout.session.completed') {
         console.log('Create ORDER -------------------------------------');
 
-
+        await createCardOrder(event.data.object);
     }
+
+    // anything but a 2xx makes Stripe retry the event
+    res.status(200).json({ received: true });
 });
 module.exports = {
     createCashOrder,
