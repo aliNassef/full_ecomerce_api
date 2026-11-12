@@ -241,7 +241,7 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
                 `EVENT : ${event}`
         );
 
-        await createCardOrder(event.data.object);
+        await createCardOrder(event.fetchRelatedObject());
     }
 
     // anything but a 2xx makes Stripe retry the event
