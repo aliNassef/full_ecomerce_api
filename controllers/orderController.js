@@ -235,13 +235,9 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
     }
 
     if (event.type === 'v1.checkout.session.completed') {
-        console.log('Create ORDER ------------------------------------- ');
-        console.log(
-            `${event.data}`
-                `EVENT : ${event}`
-        );
-
-        await createCardOrder(event.fetchRelatedObject());
+        console.log(`Create ORDER ${event.fetchRelatedObject()} -------------------------------------`);
+        const session = await event.fetchRelatedObject()
+        await createCardOrder(session);
     }
 
     // anything but a 2xx makes Stripe retry the event
