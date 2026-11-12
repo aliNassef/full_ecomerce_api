@@ -225,7 +225,7 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
     let event;
     try {
         // req.body must be the raw Buffer from express.raw() in server.js, or the signature check fails
-        event = stripe.webhooks.parseEventNotification(
+        event = stripe.parseEventNotification(
             req.body,
             signature,
             process.env.STRIPE_WEBHOOK_SECRET
