@@ -235,7 +235,11 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
     }
 
     if (event.type === 'v1.checkout.session.completed') {
-        console.log('Create ORDER -------------------------------------');
+        console.log('Create ORDER ------------------------------------- ');
+        console.log(
+            `${event.data}`
+                `EVENT : ${event}`
+        );
 
         await createCardOrder(event.data.object);
     }
