@@ -219,6 +219,9 @@ const createCardOrder = async (session) => {
 /// @access Public (verified by Stripe signature)
 const orderCheckout = asyncHandler(async (req, res, next) => {
     const signature = req.headers['stripe-signature'];
+
+    console.log('Create ORDER TEST -------------------------------------');
+
     let event;
     try {
         // req.body must be the raw Buffer from express.raw() in server.js, or the signature check fails
@@ -231,7 +234,7 @@ const orderCheckout = asyncHandler(async (req, res, next) => {
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (event.type === 'v1.checkout.session.completed') {
+    if (event.type === 'checkout.session.completed') {
         console.log('Create ORDER -------------------------------------');
 
         await createCardOrder(event.data.object);
